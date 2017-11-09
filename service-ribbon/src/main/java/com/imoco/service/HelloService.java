@@ -4,6 +4,7 @@ package com.imoco.service;
  * Created by gousili on 2017/11/9.
  */
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +19,16 @@ public class HelloService {
     @Autowired
     RestTemplate restTemplate;
 
+    @HystrixCommand(fallbackMethod = "hiError")
+    // @HystrixCommand注解。该注解对该方法创建了熔断器的功能，并指定了fallbackMethod熔断方法，
+    // 熔断方法直接返回了一个字符串
     public String hiService(String name){
         return restTemplate.getForObject("http://service-hi/hi?name="+name,String.class);
     }
+
+    //断路器
+    public String hiError(String name) {
+        return "hi,"+name+",sorry,error!";
+    }
+
 }
